@@ -6,6 +6,13 @@ function remove0x(str) {
   }
 }
 
+function isNull(str) {
+  if (str == "") return true;
+  var regu = "^[ ]+$";
+  var re = new RegExp(regu);
+  return re.test(str);
+}
+
 function addOx(str) {
   if (str.startsWith("0x")) {
     return str;
@@ -16,5 +23,6 @@ function addOx(str) {
 
 module.exports = {
   remove0x,
-  addOx
+  addOx,
+  isNull
 };

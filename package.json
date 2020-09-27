@@ -3,7 +3,10 @@
     "node": ">= 11.5.0"
   },
   "scripts": {
-    "list": "node src/show-withdraw-list.js"
+    "list": "node src/show-withdraw-list.js",
+    "tx": "node src/show-on-chain-withdraw-tx.js",
+    "create": "node src/construct-withdraw-tx-tx.js",
+    "create-sub": "node src/construct-withdraw-tx.js --sign --submit"
   },
   "dependencies": {
     "bitcoinjs-lib": "4.0.2",

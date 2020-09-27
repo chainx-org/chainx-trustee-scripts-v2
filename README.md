@@ -74,3 +74,31 @@ yarn run tx
 ```
 
 3. 构造提现交易原文
+
+如果仅需构造交易原文，不需要提交原文，执行：
+
+```javascript
+yarn run create
+```
+
+如果需要马上将所构造的交易提交到 ChainX 链上，则执行：
+
+```javascript
+yarn run create-sub
+```
+
+同时，须确保设置 `bitcoin_private_key`和`chainx_private_key`。
+
+4. 响应待签原文
+
+如果仅响应待签原文，暂不提交上链，执行：
+
+```javascript
+yarn run respond
+```
+
+如果需要马上将所构造的交易提交到 ChainX 链上，则执行：
+
+```javascript
+yarn run respond-sub
+```

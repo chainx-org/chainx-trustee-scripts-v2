@@ -38,6 +38,7 @@ async function showWithdrawList() {
     await init();
     await showWithdrawLimit();
     await showWithdrawList();
+    process.exit(0);
   } catch (e) {
     console.error(e);
     process.exit(1);
