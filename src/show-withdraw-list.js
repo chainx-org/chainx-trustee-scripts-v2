@@ -7,7 +7,8 @@
 const { getApi } = require("./chainx");
 const {
   getWithdrawLimit,
-  getBTCWithdrawList
+  getBTCWithdrawList,
+  getTxByReadStorage
 } = require("./chainx-common/index");
 
 let api = null;
@@ -25,6 +26,8 @@ async function showWithdrawList() {
   const withdrawList = await getBTCWithdrawList(api);
   console.log("提现列表");
   console.log(JSON.stringify(withdrawList));
+  const btcTxList = await getTxByReadStorage(api);
+  console.log(`交易原文列表 ${btcTxList}`);
 }
 
 (async function() {

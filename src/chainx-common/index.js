@@ -13,7 +13,15 @@ async function getWithdrawLimit(api) {
   return limit;
 }
 
+async function getTxByReadStorage(api) {
+  const { parentHash } = await api.rpc.chain.getHeader();
+  const btcTxLists = await api.query.xGatewayBitcoin.withdrawalProposal.at(
+    parentHash
+  );
+  return btcTxLists;
+}
 module.exports = {
   getBTCWithdrawList,
-  getWithdrawLimit
+  getWithdrawLimit,
+  getTxByReadStorage
 };

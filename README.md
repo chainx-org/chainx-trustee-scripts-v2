@@ -27,8 +27,27 @@
 #### rpc 接口
 
 - 获取链上代签原文
+  交易原文通过拿存储的方式,位于 bitcoin/src/lib#231: WithdrawalProposal
 
-- 获取信托列表
+  ```js代码
+  const api = await ApiPromise.create();
+
+  // Retrieve the last block header, extracting the hash and parentHash
+  const { hash, parentHash } = await api.rpc.chain.getHeader();
+
+  console.log(`last header hash ${hash.toHex()}`);
+
+  // the format is always `.at(<blockhash>, ...params)`
+  const balance = await api.query.xgatewaybitcoin.withdrawalproposal.at(
+    parentHash,
+    ALICE
+  );
+  ```
+
+````
+
+- 获取信托列表，信托相关位于ChainX common模块
+rpc接口： trustee_session_info
 
 ## How to use
 
@@ -36,7 +55,7 @@
 
 ```js
 yarn run list
-```
+````
 
 2. 显示链上信托代签原文
 
