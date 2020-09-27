@@ -106,10 +106,14 @@ async function composeBtcTx(withdrawals, fee) {
   logInputs(targetInputs);
   logOutputs(withdrawals);
 
-  const network =
-    properties["bitcoin_type"] === "mainnet"
-      ? bitcoin.networks.bitcoin
-      : bitcoin.networks.testnet;
+  console.log("withdraws..........." + JSON.stringify(withdrawals));
+
+  // const network =
+  //   properties["bitcoin_type"] === "mainnet"
+  //     ? bitcoin.networks.bitcoin
+  //     : bitcoin.networks.testnet;
+  const network = bitcoin.networks.testnet;
+
   const txb = new bitcoin.TransactionBuilder(network);
   txb.setVersion(1);
 
@@ -118,13 +122,14 @@ async function composeBtcTx(withdrawals, fee) {
   }
 
   for (const withdrawal of withdrawals) {
-    txb.addOutput(withdrawal.address, withdrawal.balance);
+    txb.addOutput(withdrawal.addr, withdrawal.balance);
   }
   if (change > 0) {
-    txb.addOutput(addr, change);
+    txb.addOutput(addr.toString(), change);
   }
 
   const signed = await signIfRequired(txb, network);
+
   let rawTx;
   if (signed) {
     rawTx = txb.build().toHex();
@@ -147,11 +152,10 @@ async function signIfRequired(txb, network) {
     process.exit(1);
   }
 
-  const info = await api.rpc.xgatewaycommon.bitcoinTrusteeSessionInfo(
-    "Bitcoin"
-  );
+  const info = await getTrusteeSessionInfo(api);
+
   const redeemScript = Buffer.from(
-    remove0x(info.hotEntity.redeemScript),
+    remove0x(info.hotAddress.redeemScript.toString()),
     "hex"
   );
 
