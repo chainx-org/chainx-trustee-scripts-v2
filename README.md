@@ -46,8 +46,18 @@
 ````
 
 - 获取信托列表，信托相关位于ChainX common模块
-rpc接口： trustee_session_info
+rpc接口： api.rpc.xgatewaycommon.bitcoinTrusteeSessionInfo
 
+### 提现
+
+构造提现交易
+
+api.xGatewayCommon.withdraw('1',0.001)
+
+```js
+
+
+```
 ## How to use
 
 1. 显示当前提现列表
