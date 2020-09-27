@@ -23,9 +23,11 @@ async function init() {
 async function submit() {
   console.log("\n开始构造并提交ChainX信托交易...");
   const keyring = new Keyring({ type: "sr25519" });
-  const alice = keyring.addFromUri("//Alice");
+  const alice = keyring.addFromUri(process.env.chainx_private_key);
 
-  const extrinsic = await api.tx.hex(addOx(rawTx));
+  const extrinsic = await api.tx["xGatewayBitcoin"]["signWithdrawTx"](
+    addOx(rawTx)
+  );
 
   extrinsic.signAndSend(alice, ({ events, status }) => {
     console.log("status:" + JSON.stringify(status));

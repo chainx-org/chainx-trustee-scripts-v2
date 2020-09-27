@@ -4,7 +4,7 @@
 
 require("dotenv").config();
 require("console.table");
-const chainx = require("./chainx");
+const { getApi } = require("./chainx");
 const { getWithdrawLimit, getBTCWithdrawalList } = require("./chainx-common");
 const { getUnspents, pickUtxos } = require("./btc-common");
 const bitcoin = require("bitcoinjs-lib");
@@ -13,6 +13,7 @@ const { remove0x, addOx } = require("./utils");
 const args = process.argv.slice(2);
 const needSign = args.find(arg => arg === "--sign");
 const needSubmit = args.find(arg => arg === "--submit");
+let api = null;
 
 async function init() {
   if (!process.env.bitcoin_fee_rate) {
@@ -25,7 +26,7 @@ async function init() {
     process.exit(1);
   }
 
-  await chainx.isRpcReady();
+  api = await getApi();
 }
 
 function filterSmallWithdraw(list, minimal) {
@@ -137,7 +138,9 @@ async function signIfRequired(txb, network) {
     process.exit(1);
   }
 
-  const info = await chainx.trustee.getTrusteeSessionInfo("Bitcoin");
+  const info = await api.rpc.xgatewaycommon.bitcoinTrusteeSessionInfo(
+    "Bitcoin"
+  );
   const redeemScript = Buffer.from(
     remove0x(info.hotEntity.redeemScript),
     "hex"
@@ -166,28 +169,17 @@ async function submitIfRequired(withdrawals, rawTx) {
     process.exit(1);
   }
 
-  const ids = withdrawals.map(withdrawal => withdrawal.id);
-  const extrinsic = await chainx.trustee.createWithdrawTx(ids, addOx(rawTx));
-  extrinsic.signAndSend(
-    process.env.chainx_private_key,
-    { acceleration: 1 },
-    (error, result) => {
-      if (error) {
-        console.error("签名且发送交易失败：");
-        console.error(error);
-      }
+  const keyring = new Keyring({ type: "sr25519" });
+  const alice = keyring.addFromUri(process.env.chainx_private_key);
 
-      if (result) {
-        console.log("交易状态：", result.status);
-
-        if (result.status === "Finalized") {
-          console.log("交易执行结果：", result.result);
-          chainx.provider.websocket.close();
-          process.exit(0);
-        }
-      }
-    }
+  const extrinsic = await api.tx["xGatewayBitcoin"]["createWithdrawTx"](
+    ids,
+    addOx(rawTx)
   );
+
+  extrinsic.signAndSend(alice, ({ events, status }) => {
+    console.log("status:" + JSON.stringify(status));
+  });
 }
 
 function logMinerFee(minerFee) {
