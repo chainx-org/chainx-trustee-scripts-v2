@@ -39,8 +39,7 @@
 
   // the format is always `.at(<blockhash>, ...params)`
   const balance = await api.query.xgatewaybitcoin.withdrawalproposal.at(
-    parentHash,
-    ALICE
+    parentHash
   );
   ```
 

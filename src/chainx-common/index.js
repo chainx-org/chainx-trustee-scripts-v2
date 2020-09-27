@@ -1,3 +1,8 @@
+async function getTrusteeSessionInfo(api) {
+  const trusteeList = await api.rpc.xgatewaycommon.bitcoinTrusteeSessionInfo();
+  return trusteeList;
+}
+
 async function getBTCWithdrawList(api) {
   //  TODO: 处理分页问题
   const withdrawList = await api.rpc.xgatewayrecords.withdrawalListByChain(
@@ -23,5 +28,6 @@ async function getTxByReadStorage(api) {
 module.exports = {
   getBTCWithdrawList,
   getWithdrawLimit,
-  getTxByReadStorage
+  getTxByReadStorage,
+  getTrusteeSessionInfo
 };
