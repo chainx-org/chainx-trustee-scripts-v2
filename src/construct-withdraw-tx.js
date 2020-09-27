@@ -68,7 +68,9 @@ async function composeBtcTx(withdrawals, fee) {
   console.log("properties......" + JSON.stringify(properties));
   console.log("tursteesessioniffo..." + JSON.stringify(info));
   const { addr } = info.hotAddress;
-  const { required, total } = info.counts;
+  //const { required, total } = info.counts;
+  required = 1;
+  total = 10;
 
   const unspents = await getUnspents(addr, properties["bitcoin_type"]);
   unspents.sort((a, b) => Number(b.amount) - Number(a.amount));
