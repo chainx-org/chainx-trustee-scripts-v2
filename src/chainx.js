@@ -1,21 +1,25 @@
-import { ApiPromise, WsProvider } from '@polkadot/api'
-import { options } from '@chainx-v2/api'
+const { ApiPromise, WsProvider } = require("@polkadot/api");
+const { options } = require("@chainx-v2/api");
 
-const url = 'ws://47.114.150.67:8000'
+const url = "ws://47.114.150.67:8000";
 
-let api = null
-let provider = null
+let api = null;
+let provider = null;
 
-export const getApi = async () => {
-    const wsProvider = new WsProvider(url)
-    api = new ApiPromise(options({ provider: wsProvider }))
+const getApi = async () => {
+  const wsProvider = new WsProvider(url);
+  api = new ApiPromise(options({ provider: wsProvider }));
 
-    await api.isReady
+  await api.isReady;
 
-    if (provider) {
-        provider.disconnect()
-    }
+  if (provider) {
+    provider.disconnect();
+  }
 
-    provider = wsProvider
-    return api
-}
+  provider = wsProvider;
+  return api;
+};
+
+module.exports = {
+  getApi
+};
