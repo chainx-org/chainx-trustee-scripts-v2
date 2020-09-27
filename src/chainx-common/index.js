@@ -3,12 +3,25 @@ async function getTrusteeSessionInfo(api) {
   return trusteeList;
 }
 
+async function getChainProperties(api) {
+  const systemProperties = await api.rpc.system.properties();
+  const properties = systemProperties.toJSON();
+  return properties;
+}
+
 async function getBTCWithdrawList(api) {
   //  TODO: 处理分页问题
-  const withdrawList = await api.rpc.xgatewayrecords.withdrawalListByChain(
+  const withdrawObject = await api.rpc.xgatewayrecords.withdrawalListByChain(
     "Bitcoin"
   );
-  console.log(JSON.stringify(withdrawList));
+  let withdrawList = [];
+  Object.entries(withdrawObject.toJSON()).forEach(([key, value]) => {
+    withdrawList.push({
+      id: key,
+      ...value
+    });
+  });
+
   return withdrawList;
 }
 
@@ -29,5 +42,6 @@ module.exports = {
   getBTCWithdrawList,
   getWithdrawLimit,
   getTxByReadStorage,
-  getTrusteeSessionInfo
+  getTrusteeSessionInfo,
+  getChainProperties
 };

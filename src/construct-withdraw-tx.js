@@ -5,7 +5,12 @@
 require("dotenv").config();
 require("console.table");
 const { getApi } = require("./chainx");
-const { getWithdrawLimit, getBTCWithdrawalList } = require("./chainx-common");
+const {
+  getWithdrawLimit,
+  getBTCWithdrawList,
+  getTrusteeSessionInfo,
+  getChainProperties
+} = require("./chainx-common");
 const { getUnspents, pickUtxos } = require("./btc-common");
 const bitcoin = require("bitcoinjs-lib");
 const { remove0x, addOx } = require("./utils");
@@ -34,12 +39,13 @@ function filterSmallWithdraw(list, minimal) {
 }
 
 function leaveOnelyApplying(list) {
-  return list.filter(withdrawal => withdrawal.status.value === "Applying");
+  return list.filter(withdrawal => withdrawal.state === "Applying");
 }
 
 async function construct() {
-  const list = await getBTCWithdrawalList(chainx);
-  const limit = await getWithdrawLimit(chainx);
+  const list = await getBTCWithdrawList(api);
+  const limit = await getWithdrawLimit(api);
+  console.log("limit:" + JSON.stringify(list));
 
   let filteredList = filterSmallWithdraw(list, limit.minimalWithdrawal);
   filteredList = leaveOnelyApplying(filteredList);
@@ -52,15 +58,16 @@ async function construct() {
   await composeBtcTx(filteredList, limit.fee);
 
   if (!needSubmit) {
-    chainx.provider.websocket.close();
     process.exit(0);
   }
 }
 
 async function composeBtcTx(withdrawals, fee) {
-  const info = await chainx.trustee.getTrusteeSessionInfo("Bitcoin");
-  const properties = await chainx.chain.chainProperties();
-  const { addr } = info.hotEntity;
+  const info = await getTrusteeSessionInfo(api);
+  const properties = await getChainProperties(api);
+  console.log("properties......" + JSON.stringify(properties));
+  console.log("tursteesessioniffo..." + JSON.stringify(info));
+  const { addr } = info.hotAddress;
   const { required, total } = info.counts;
 
   const unspents = await getUnspents(addr, properties["bitcoin_type"]);
