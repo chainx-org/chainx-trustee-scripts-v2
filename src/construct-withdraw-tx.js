@@ -5,6 +5,7 @@
 require("dotenv").config();
 require("console.table");
 const { getApi } = require("./chainx");
+const { Keyring } = require("@polkadot/api");
 const {
   getWithdrawLimit,
   getBTCWithdrawList,
@@ -165,13 +166,9 @@ async function signIfRequired(txb, network) {
     "hex"
   );
 
-  console.log(`redeemScript... ${remove0x(
-    info.hotAddress.redeemScript.toString()
-  )} 
-  redeem.... 
-  ${info.hotAddress.redeemScript}`);
+  console.log(`redeemScript... ${info.hotAddress.redeemScript.toString()}`);
   const keyPair = bitcoin.ECPair.fromWIF(
-    process.env.bitcoin_private_key,
+    "cPc4Juk1628a7p9oDSsA2QxqCL6Q9hKuRmZtHH2d9NLYgDfvC9zB",
     network
   );
   for (let i = 0; i < txb.__inputs.length; i++) {
@@ -195,7 +192,7 @@ async function submitIfRequired(withdrawals, rawTx) {
 
   const keyring = new Keyring({ type: "sr25519" });
   const alice = keyring.addFromUri(process.env.chainx_private_key);
-
+  const ids = withdrawals.map(withdrawal => withdrawal.id);
   const extrinsic = await api.tx["xGatewayBitcoin"]["createWithdrawTx"](
     ids,
     addOx(rawTx)
