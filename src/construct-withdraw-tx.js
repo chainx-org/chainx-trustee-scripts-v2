@@ -40,7 +40,10 @@ function filterSmallWithdraw(list, minimal) {
 }
 
 function leaveOnelyApplying(list) {
-  return list.filter(withdrawal => withdrawal.state === "Applying");
+  return list.filter(
+    withdrawal =>
+      withdrawal.state === "Applying" || withdrawal.state === "Processing"
+  );
 }
 
 async function construct() {
@@ -74,7 +77,6 @@ async function composeBtcTx(withdrawals, fee) {
   console.log("properties......" + JSON.stringify(properties));
   console.log("tursteesessioninfo..." + info);
   const { addr } = info.hotAddress;
-  //const { required, total } = info.counts;
 
   const required = info.threshold;
   const total = info.trusteeList.length;
@@ -129,7 +131,7 @@ async function composeBtcTx(withdrawals, fee) {
   }
 
   for (const withdrawal of withdrawals) {
-    txb.addOutput(withdrawal.addr, withdrawal.balance);
+    txb.addOutput(withdrawal.addr, withdrawal.balance - fee);
   }
   if (change > 0) {
     txb.addOutput(addr.toString(), change);
@@ -168,7 +170,7 @@ async function signIfRequired(txb, network) {
 
   console.log(`redeemScript... ${info.hotAddress.redeemScript.toString()}`);
   const keyPair = bitcoin.ECPair.fromWIF(
-    "cPc4Juk1628a7p9oDSsA2QxqCL6Q9hKuRmZtHH2d9NLYgDfvC9zB",
+    process.env.bitcoin_private_key,
     network
   );
   for (let i = 0; i < txb.__inputs.length; i++) {

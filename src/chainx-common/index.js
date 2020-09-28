@@ -40,11 +40,13 @@ async function getBTCWithdrawList(api) {
 async function getWithdrawLimit(api) {
   // TODO: Bitcoin asstId为1
   const limit = await api.rpc.xgatewaycommon.withdrawalLimit("1");
-  return limit;
+  const json = JSON.parse(limit.toString());
+  return json;
 }
 
 async function getTxByReadStorage(api) {
   const { parentHash } = await api.rpc.chain.getHeader();
+  console.log(`hash.... ${parentHash}`);
   const btcTxLists = await api.query.xGatewayBitcoin.withdrawalProposal.at(
     parentHash
   );
