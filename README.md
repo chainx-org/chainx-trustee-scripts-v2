@@ -52,12 +52,10 @@ rpc接口： api.rpc.xgatewaycommon.bitcoinTrusteeSessionInfo
 
 构造提现交易
 
-api.xGatewayCommon.withdraw('1',0.001)
 
-```js
+### 生成TestNet 多签地址
+wif格式：https://learnmeabitcoin.com/technical/wif
 
-
-```
 ## How to use
 
 1. 显示当前提现列表

@@ -62,15 +62,21 @@ async function construct() {
   }
 }
 
+/**
+ *
+ *  获取unspent output 进行btc 提现
+ *
+ * */
 async function composeBtcTx(withdrawals, fee) {
   const info = await getTrusteeSessionInfo(api);
   const properties = await getChainProperties(api);
   console.log("properties......" + JSON.stringify(properties));
-  console.log("tursteesessioniffo..." + JSON.stringify(info));
+  console.log("tursteesessioninfo..." + info);
   const { addr } = info.hotAddress;
   //const { required, total } = info.counts;
-  required = 1;
-  total = 10;
+
+  const required = info.threshold;
+  const total = info.trusteeList.length;
 
   const unspents = await getUnspents(addr, properties["bitcoin_type"]);
   unspents.sort((a, b) => Number(b.amount) - Number(a.amount));
@@ -159,6 +165,11 @@ async function signIfRequired(txb, network) {
     "hex"
   );
 
+  console.log(`redeemScript... ${remove0x(
+    info.hotAddress.redeemScript.toString()
+  )} 
+  redeem.... 
+  ${info.hotAddress.redeemScript}`);
   const keyPair = bitcoin.ECPair.fromWIF(
     process.env.bitcoin_private_key,
     network
