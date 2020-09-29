@@ -22,7 +22,7 @@
 
 ### 显示链上代签原文
 
-![](https://github.com/chainx-org/chainx-trustee-scripts-v2/blob/master/images/withdraw-tx.png)
+![image](https://github.com/chainx-org/chainx-trustee-scripts-v2/blob/master/images/withdraw-tx.png)
 
 #### rpc 接口
 

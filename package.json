@@ -8,7 +8,9 @@
     "create": "node src/construct-withdraw-tx-tx.js",
     "create-sub": "node src/construct-withdraw-tx.js --sign --submit",
     "respond": "node src/respond-withdraw-tx.js",
-    "respond-sub": "node src/respond-withdraw-tx.js --submit"
+    "respond-sub": "node src/respond-withdraw-tx.js --submit",
+    "sign": "node src/sign-tx.js",
+    "submit": "node src/submit.js"
   },
   "dependencies": {
     "bitcoinjs-lib": "4.0.2",
@@ -23,7 +25,8 @@
   "devDependencies": {
     "husky": "^2.3.0",
     "prettier": "1.17.1",
-    "pretty-quick": "^1.11.0"
+    "pretty-quick": "^1.11.0",
+    "typescript": "^4.0.3"
   },
   "husky": {
     "hooks": {
