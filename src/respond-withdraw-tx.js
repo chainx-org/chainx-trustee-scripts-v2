@@ -51,11 +51,14 @@ async function respond() {
 async function parseRawTxAndLog(rawTx) {
   const tx = bitcoin.Transaction.fromHex(remove0x(rawTx));
 
+  const properties = await getChainProperties(api);
+  const network =
+    properties["bitcoin_type"] === "mainnet"
+      ? bitcoin.networks.bitcoin
+      : bitcoin.networks.testnet;
+
   const normalizedOuts = tx.outs.map(out => {
-    const address = bitcoin.address.fromOutputScript(
-      out.script,
-      bitcoin.networks.testnet
-    );
+    const address = bitcoin.address.fromOutputScript(out.script, network);
     const value = out.value / Math.pow(10, 8);
     return { address, ["value(BTC)"]: value };
   });
@@ -68,7 +71,10 @@ async function parseRawTxAndLog(rawTx) {
 
 async function sign(rawTx) {
   const properties = await getChainProperties(api);
-  const network = bitcoin.networks.testnet;
+  const network =
+    properties["bitcoin_type"] === "mainnet"
+      ? bitcoin.networks.bitcoin
+      : bitcoin.networks.testnet;
 
   const tx = bitcoin.Transaction.fromHex(remove0x(rawTx));
   const txb = bitcoin.TransactionBuilder.fromTransaction(tx, network);

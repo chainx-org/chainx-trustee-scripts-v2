@@ -74,8 +74,7 @@ async function construct() {
 async function composeBtcTx(withdrawals, fee) {
   const info = await getTrusteeSessionInfo(api);
   const properties = await getChainProperties(api);
-  console.log("properties......" + JSON.stringify(properties));
-  console.log("tursteesessioninfo..." + info);
+
   const { addr } = info.hotAddress;
 
   const required = info.threshold;
@@ -115,13 +114,10 @@ async function composeBtcTx(withdrawals, fee) {
   logInputs(targetInputs);
   logOutputs(withdrawals);
 
-  console.log("withdraws..........." + JSON.stringify(withdrawals));
-
-  // const network =
-  //   properties["bitcoin_type"] === "mainnet"
-  //     ? bitcoin.networks.bitcoin
-  //     : bitcoin.networks.testnet;
-  const network = bitcoin.networks.testnet;
+  const network =
+    properties["bitcoin_type"] === "mainnet"
+      ? bitcoin.networks.bitcoin
+      : bitcoin.networks.testnet;
 
   const txb = new bitcoin.TransactionBuilder(network);
   txb.setVersion(1);

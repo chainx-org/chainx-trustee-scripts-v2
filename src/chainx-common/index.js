@@ -1,8 +1,31 @@
+const bitcoin = require("bitcoinjs-lib");
+// 获取信托节点列表
 async function getTrusteeSessionInfo(api) {
   const trusteeList = await api.rpc.xgatewaycommon.bitcoinTrusteeSessionInfo();
   return trusteeList;
 }
 
+// 获取Storage中信托提现的Proposal状态
+async function getTxByReadStorage(api) {
+  const { parentHash } = await api.rpc.chain.getHeader();
+  const btcTxLists = await api.query.xGatewayBitcoin.withdrawalProposal.at(
+    parentHash
+  );
+  return JSON.parse(btcTxLists.toString());
+}
+
+// 获取BitCoin的Type
+async function getBtcNetworkState(api) {
+  const { parentHash } = await api.rpc.chain.getHeader();
+  const netWorkType = await api.query.xGatewayBitcoin.networkId.at(parentHash);
+  if (netWorkType.toString() === "Testnet") {
+    return "testnet";
+  } else {
+    return "mainnet";
+  }
+}
+
+// 获取链状态
 async function getChainProperties(api) {
   const systemProperties = await api.rpc.system.properties();
   const properties = systemProperties.toJSON();
@@ -16,7 +39,10 @@ async function getChainProperties(api) {
       ...json[id]
     };
   });
-  properties["bitcoin_type"] = "testnet";
+
+  const networkType = await getBtcNetworkState(api);
+
+  properties.bitcoin_type = networkType;
 
   return properties;
 }
@@ -44,17 +70,9 @@ async function getWithdrawLimit(api) {
   return json;
 }
 
-async function getTxByReadStorage(api) {
-  const { parentHash } = await api.rpc.chain.getHeader();
-  console.log(`hash.... ${parentHash}`);
-  const btcTxLists = await api.query.xGatewayBitcoin.withdrawalProposal.at(
-    parentHash
-  );
-
-  return JSON.parse(btcTxLists.toString());
-}
 module.exports = {
   getBTCWithdrawList,
+  getBtcNetworkState,
   getWithdrawLimit,
   getTxByReadStorage,
   getTrusteeSessionInfo,
