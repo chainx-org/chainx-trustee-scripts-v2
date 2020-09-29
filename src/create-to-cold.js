@@ -132,7 +132,6 @@ function logOutputs(txb, network) {
     await init();
     await construct();
 
-    chainx.provider.websocket.close();
     process.exit(0);
   } catch (e) {
     console.error(e);
