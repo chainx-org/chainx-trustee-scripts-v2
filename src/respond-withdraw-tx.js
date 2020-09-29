@@ -91,8 +91,27 @@ async function submitIfRequired(rawTx) {
     addOx(rawTx)
   );
 
-  extrinsic.signAndSend(alice, ({ events, status }) => {
+  extrinsic.signAndSend(alice, ({ events = [], status }) => {
     console.log("status:" + JSON.stringify(status));
+
+    console.log(`Current status is ${status.type}`);
+    if (status.isFinalized) {
+      console.log(`Transaction included at blockHash ${status.asFinalized}`);
+      // Loop through Vec<EventRecord> to display all events
+      events.forEach(({ phase, event: { data, method, section } }) => {
+        //console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+        if (method === "ExtrinsicFailed") {
+          console.error(
+            `提交ChainX信托签名交易失败 \n ${phase}: ${section}.${method}:: ${data}`
+          );
+          process.exit(0);
+        } else if (method === "ExtrinsicSuccess") {
+          console.log(
+            `提交信托签名交易成功 \n ${phase}: ${section}.${method}:: ${data}`
+          );
+        }
+      });
+    }
   });
 }
 
