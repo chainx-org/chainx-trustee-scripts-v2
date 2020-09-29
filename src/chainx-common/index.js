@@ -50,7 +50,8 @@ async function getTxByReadStorage(api) {
   const btcTxLists = await api.query.xGatewayBitcoin.withdrawalProposal.at(
     parentHash
   );
-  return btcTxLists;
+
+  return JSON.parse(btcTxLists.toString());
 }
 module.exports = {
   getBTCWithdrawList,

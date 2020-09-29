@@ -1,9 +1,14 @@
 require("dotenv").config();
-const { remove0x, addOx } = require("./utils");
+const { remove0x, addOx, isNull } = require("./utils");
 const { Keyring } = require("@polkadot/api");
+const { getApi } = require("./chainx");
 const bitcoin = require("bitcoinjs-lib");
+const {
+  getTrusteeSessionInfo,
+  getTxByReadStorage,
+  getChainProperties
+} = require("./chainx-common/index");
 
-const { getApi } = require("@polkadot/api");
 const args = process.argv.slice(2);
 const needSubmit = args.find(arg => arg === "--submit");
 
@@ -13,10 +18,11 @@ let api;
 async function init() {
   api = await getApi();
 
-  const info = await api.rpc.xgatewaycommon.bitcoinTrusteeSessionInfo(
-    "Bitcoin"
+  const info = await getTrusteeSessionInfo(api);
+  redeemScript = Buffer.from(
+    remove0x(info.hotAddress.redeemScript.toString()),
+    "hex"
   );
-  redeemScript = Buffer.from(remove0x(info.hotEntity.redeemScript), "hex");
 
   if (!process.env.bitcoin_private_key) {
     console.error("没有设置bitcoin_private_key");
@@ -25,28 +31,44 @@ async function init() {
 }
 
 async function respond() {
-  const withdrawalTx = await api.rpc.xgatewaycommon.withdrawalListByChain(
-    "Bitcoin"
-  );
+  const withdrawalTx = await getTxByReadStorage(api);
 
-  if (!withdrawalTx) {
-    console.log("目前链上无代签原文");
+  if (isNull(withdrawalTx.toString())) {
+    console.log("当前链上无待签原文");
     process.exit(0);
-  }
+  } else {
+    console.log("代签原文: \n", withdrawalTx.tx);
+    await parseRawTxAndLog(withdrawalTx.tx);
 
-  await sign(withdrawalTx.tx);
+    await sign(withdrawalTx.tx);
 
-  if (!needSubmit) {
-    process.exit(0);
+    if (!needSubmit) {
+      process.exit(0);
+    }
   }
 }
 
+async function parseRawTxAndLog(rawTx) {
+  const tx = bitcoin.Transaction.fromHex(remove0x(rawTx));
+
+  const normalizedOuts = tx.outs.map(out => {
+    const address = bitcoin.address.fromOutputScript(
+      out.script,
+      bitcoin.networks.testnet
+    );
+    const value = out.value / Math.pow(10, 8);
+    return { address, ["value(BTC)"]: value };
+  });
+
+  // TODO: 输出inputs列表，需查询比特币网络
+
+  console.log("\nOutputs 列表:");
+  console.table(normalizedOuts);
+}
+
 async function sign(rawTx) {
-  const properties = await chainx.chain.chainProperties();
-  const network =
-    properties["bitcoin_type"] === "mainnet"
-      ? bitcoin.networks.bitcoin
-      : bitcoin.networks.testnet;
+  const properties = await getChainProperties(api);
+  const network = bitcoin.networks.testnet;
 
   const tx = bitcoin.Transaction.fromHex(remove0x(rawTx));
   const txb = bitcoin.TransactionBuilder.fromTransaction(tx, network);
@@ -62,7 +84,7 @@ async function sign(rawTx) {
     }
   } catch (e) {
     console.error("签名出错：", e);
-    process.exit(1);
+    process.exit(0);
   }
 
   const signedRawTx = txb.build().toHex();
@@ -91,9 +113,7 @@ async function submitIfRequired(rawTx) {
     addOx(rawTx)
   );
 
-  extrinsic.signAndSend(alice, ({ events = [], status }) => {
-    console.log("status:" + JSON.stringify(status));
-
+  await extrinsic.signAndSend(alice, ({ events = [], status }) => {
     console.log(`Current status is ${status.type}`);
     if (status.isFinalized) {
       console.log(`Transaction included at blockHash ${status.asFinalized}`);

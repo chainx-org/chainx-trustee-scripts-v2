@@ -19,8 +19,7 @@ async function init() {
 
 // 显示链上代签原文
 async function showWithdrawalTx() {
-  const result = await getTxByReadStorage(api);
-  const withdrawTx = JSON.parse(result.toString());
+  const withdrawTx = await getTxByReadStorage(api);
 
   if (isNull(withdrawTx.toString())) {
     console.log("当前链上无待签原文");
@@ -32,7 +31,7 @@ async function showWithdrawalTx() {
       console.log("目前没有信托签名");
     } else {
       await logSignedIntentions(withdrawTx.trusteeList);
-      if (withdrawTx.signStatus) {
+      if (withdrawTx.sigState === "Finish") {
         console.log("签名已完成");
       }
     }
