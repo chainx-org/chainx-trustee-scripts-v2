@@ -29,7 +29,6 @@ async function getBtcNetworkState(api) {
 async function getChainProperties(api) {
   const systemProperties = await api.rpc.system.properties();
   const properties = systemProperties.toJSON();
-
   // BTC 精度信息
   const assets = await api.rpc.xassets.getAssets();
   const json = assets.toJSON();
