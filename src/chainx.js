@@ -1,7 +1,7 @@
 const { ApiPromise, WsProvider } = require("@polkadot/api");
 const { options } = require("@chainx-v2/api");
 
-const url = "ws://47.114.150.67:8000";
+const url = "wss://staging-1.chainx.org/ws";
 
 let api = null;
 let provider = null;
