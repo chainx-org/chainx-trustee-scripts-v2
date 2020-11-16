@@ -5,7 +5,7 @@
   "scripts": {
     "list": "node src/show-withdraw-list.js",
     "tx": "node src/show-on-chain-withdraw-tx.js",
-    "create": "node src/construct-withdraw-tx-tx.js",
+    "create": "node src/construct-withdraw-tx.js",
     "create-sub": "node src/construct-withdraw-tx.js --sign --submit",
     "respond": "node src/respond-withdraw-tx.js",
     "respond-sub": "node src/respond-withdraw-tx.js --submit",

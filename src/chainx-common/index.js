@@ -11,7 +11,7 @@ async function getTxByReadStorage(api) {
   const btcTxLists = await api.query.xGatewayBitcoin.withdrawalProposal.at(
     parentHash
   );
-  return JSON.parse(btcTxLists.toString());
+  return btcTxLists;
 }
 
 // 获取BitCoin的Type
