@@ -48,10 +48,10 @@
     bs58 "^4.0.1"
     tweetnacl "^1.0.0"
 
-"@chainx-v2/api@^0.0.39":
-  version "0.0.39"
-  resolved "https://registry.yarnpkg.com/@chainx-v2/api/-/api-0.0.39.tgz#5f2a9bae2f7f4bf85ab25f98989ffd7d477e11e0"
-  integrity sha512-w2K3hJcbmh64Kearb1TWB/9YKJXY92e7WYqFRxMNbSK3yRPiKNQbI6ebZY135lmZ0CqySG/NmLIe4HiW7wAVCg==
+"@chainx-v2/api@^0.0.43":
+  version "0.0.43"
+  resolved "https://registry.yarnpkg.com/@chainx-v2/api/-/api-0.0.43.tgz#33c086ef0ef67436557246e21267d1abcf725cc5"
+  integrity sha512-1ew+l0ypycTq4lAIpSwAy2dIHUhmuG6l9OL7yNOaXGchgccW/+EjsWN21ljLoD+wLcbYZiun9gbkUQxxziK+Dw==
   dependencies:
     "@babel/runtime" "^7.11.2"
     "@chainx-v2/account" "0.0.39"
