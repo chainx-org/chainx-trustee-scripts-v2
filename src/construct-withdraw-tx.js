@@ -49,7 +49,6 @@ function leaveOnelyApplying(list) {
 async function construct() {
   const list = await getBTCWithdrawList(api);
   const limit = await getWithdrawLimit(api);
-  console.log("limit:" + JSON.stringify(list));
 
   let filteredList = filterSmallWithdraw(list, limit.minimalWithdrawal);
   filteredList = leaveOnelyApplying(filteredList);
@@ -191,31 +190,69 @@ async function submitIfRequired(withdrawals, rawTx) {
   const keyring = new Keyring({ type: "sr25519" });
   const alice = keyring.addFromUri(process.env.chainx_private_key);
   const ids = withdrawals.map(withdrawal => withdrawal.id);
-  const extrinsic = await api.tx["xGatewayBitcoin"]["createWithdrawTx"](
-    ids,
-    addOx(rawTx)
-  );
 
-  extrinsic.signAndSend(alice, ({ events = [], status }) => {
-    console.log(`Current status is ${status.type}`);
-    if (status.isFinalized) {
-      console.log(`Transaction included at blockHash ${status.asFinalized}`);
-      // Loop through Vec<EventRecord> to display all events
-      events.forEach(({ phase, event: { data, method, section } }) => {
-        //console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
-        if (method === "ExtrinsicFailed") {
-          console.error(
-            `提交ChainX信托签名交易失败 \n ${phase}: ${section}.${method}:: ${data}`
-          );
-          process.exit(0);
-        } else if (method === "ExtrinsicSuccess") {
+  withdrawals.forEach(async (item, index) => {
+    if (item.state === "Processing") {
+      const extrinsic = await api.tx["xGatewayBitcoin"]["signWithdrawTx"](
+        addOx(rawTx)
+      );
+
+      extrinsic.signAndSend(alice, ({ events = [], status }) => {
+        console.log(`Current status is ${status.type}`);
+        if (status.isFinalized) {
           console.log(
-            `提交信托签名交易成功 \n ${phase}: ${section}.${method}:: ${data}`
+            `Transaction included at blockHash ${status.asFinalized}`
           );
+          // Loop through Vec<EventRecord> to display all events
+          events.forEach(({ phase, event: { data, method, section } }) => {
+            //console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+            if (method === "ExtrinsicFailed") {
+              console.error(
+                `提交ChainX信托签名交易失败 \n ${phase}: ${section}.${method}:: ${data}`
+              );
+              process.exit(0);
+            } else if (method === "ExtrinsicSuccess") {
+              console.log(
+                `提交信托签名交易成功 \n ${phase}: ${section}.${method}:: ${data}`
+              );
+            }
+          });
+        }
+      });
+    } else {
+      const extrinsic = await api.tx["xGatewayBitcoin"]["createWithdrawTx"](
+        item.id,
+        addOx(rawTx)
+      );
+
+      extrinsic.signAndSend(alice, ({ events = [], status }) => {
+        console.log(`Current status is ${status.type}`);
+        if (status.isFinalized) {
+          console.log(
+            `Transaction included at blockHash ${status.asFinalized}`
+          );
+          // Loop through Vec<EventRecord> to display all events
+          events.forEach(({ phase, event: { data, method, section } }) => {
+            //console.log(`\t' ${phase}: ${section}.${method}:: ${data}`);
+            if (method === "ExtrinsicFailed") {
+              console.error(
+                `提交ChainX信托签名交易失败 \n ${phase}: ${section}.${method}:: ${data}`
+              );
+              process.exit(0);
+            } else if (method === "ExtrinsicSuccess") {
+              console.log(
+                `提交信托签名交易成功 \n ${phase}: ${section}.${method}:: ${data}`
+              );
+            }
+          });
         }
       });
     }
   });
+  const extrinsic = await api.tx["xGatewayBitcoin"]["createWithdrawTx"](
+    ids,
+    addOx(rawTx)
+  );
 }
 
 function logMinerFee(minerFee) {
