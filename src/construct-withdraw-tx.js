@@ -215,6 +215,7 @@ async function submitIfRequired(withdrawals, rawTx) {
               console.log(
                 `提交信托签名交易成功 \n ${phase}: ${section}.${method}:: ${data}`
               );
+              process.exit(0);
             }
           });
         }
