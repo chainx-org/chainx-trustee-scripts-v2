@@ -58,6 +58,16 @@ async function construct() {
     process.exit(0);
   }
 
+  console.log("提现列表：+ " + JSON.stringify(filteredList));
+  const normalizedOuts = filteredList.map(withdraw => {
+    const address = withdraw.addr;
+    const balance = Number(withdraw.balance) / Math.pow(10, 8);
+    const state = withdraw.state;
+    return { address, balance, state };
+  });
+
+  console.table(normalizedOuts);
+
   await composeBtcTx(filteredList, limit.fee);
 
   if (!needSubmit) {
