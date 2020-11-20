@@ -201,6 +201,8 @@ async function submitIfRequired(withdrawals, rawTx) {
   const alice = keyring.addFromUri(process.env.chainx_private_key);
   const ids = withdrawals.map(withdrawal => withdrawal.id);
 
+  console.log("idx..." + JSON.stringify(ids));
+
   withdrawals.forEach(async (item, index) => {
     if (item.state === "Processing") {
       const extrinsic = await api.tx["xGatewayBitcoin"]["signWithdrawTx"](
@@ -231,8 +233,9 @@ async function submitIfRequired(withdrawals, rawTx) {
         }
       });
     } else {
+      console.log(`item id：${item.id}`);
       const extrinsic = await api.tx["xGatewayBitcoin"]["createWithdrawTx"](
-        item.id,
+        ids,
         addOx(rawTx)
       );
 
@@ -254,6 +257,7 @@ async function submitIfRequired(withdrawals, rawTx) {
               console.log(
                 `提交信托签名交易成功 \n ${phase}: ${section}.${method}:: ${data}`
               );
+              process.exit(0);
             }
           });
         }
