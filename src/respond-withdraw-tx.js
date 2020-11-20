@@ -31,13 +31,21 @@ async function init() {
 }
 
 async function respond() {
-  const withdrawalTx = await getTxByReadStorage(api);
+  let withdrawalTx = await getTxByReadStorage(api);
 
-  if (isNull(withdrawalTx.toString())) {
+  if (!withdrawalTx || isNull(withdrawalTx.toString())) {
     console.log("当前链上无待签原文");
     process.exit(0);
   } else {
-    console.log("代签原文: \n", withdrawalTx.tx);
+    console.log(`代签原文: \n `, withdrawalTx.tx);
+    const normalizedOuts = withdrawalTx.trusteeList.map(trustee => {
+      const address = trustee[0];
+      const result = trustee[1];
+      return { ["信托地址:"]: address, ["签名结果:"]: result };
+    });
+
+    console.table(normalizedOuts);
+
     await parseRawTxAndLog(withdrawalTx.tx);
 
     await sign(withdrawalTx.tx);
@@ -130,7 +138,6 @@ async function submitIfRequired(rawTx) {
           console.error(
             `提交ChainX信托签名交易失败 \n ${phase}: ${section}.${method}:: ${data}`
           );
-          process.exit(0);
         } else if (method === "ExtrinsicSuccess") {
           console.log(
             `提交信托签名交易成功 \n ${phase}: ${section}.${method}:: ${data}`

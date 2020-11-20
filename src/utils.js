@@ -7,7 +7,8 @@ function remove0x(str) {
 }
 
 function isNull(str) {
-  if (str == "") return true;
+  if (str === "") return true;
+  if (JSON.stringify(str) === "{}") return true;
   var regu = "^[ ]+$";
   var re = new RegExp(regu);
   return re.test(str);
